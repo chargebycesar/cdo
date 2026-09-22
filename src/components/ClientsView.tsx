@@ -14,6 +14,8 @@ interface Props {
   onDeleteClient: (clientId: string) => void;
   onSelectProject: (projectId: string) => void;
   hayDrive?: boolean; // cuenta de Google vinculada: los archivos van a su Drive
+  vista?: 'tarjetas' | 'lista'; // se guarda en la configuración, que se sincroniza
+  onCambiarVista?: (v: 'tarjetas' | 'lista') => void;
   onAviso?: (texto: string, tipo?: 'ok' | 'error' | 'info') => void;
 }
 
@@ -28,9 +30,9 @@ const LIMITE_ADJUNTO = 400 * 1024; // 400 KB por archivo incrustado
 
 const formVacio = { nombre: '', nif: '', email: '', telefono: '', direccion: '', ciudad: '', codigoPostal: '', notas: '', exigirFirma: true, tipoCliente: 'particular' as TipoCliente };
 
-export const ClientsView: React.FC<Props> = ({ clients, projects, invoices, onCreateClient, onUpdateClient, onDeleteClient, onSelectProject, hayDrive = false, onAviso }) => {
+export const ClientsView: React.FC<Props> = ({ clients, projects, invoices, onCreateClient, onUpdateClient, onDeleteClient, onSelectProject, hayDrive = false, onAviso, vista, onCambiarVista }) => {
   const [busqueda, setBusqueda] = useState('');
-  const [modo, setModo] = useState<'tarjetas' | 'lista'>(() => (localStorage.getItem('obracontrol-clientes-modo') as any) || 'tarjetas');
+  const modo = vista || 'tarjetas';
   const [tipoFiltro, setTipoFiltro] = useState<'todos' | TipoCliente>('todos');
   const [seleccionado, setSeleccionado] = useState<Client | null>(null);
   const [pestana, setPestana] = useState<'info' | 'obras' | 'fotos' | 'docs' | 'facturas'>('info');
@@ -45,10 +47,7 @@ export const ClientsView: React.FC<Props> = ({ clients, projects, invoices, onCr
   const photoInputRef = useRef<HTMLInputElement>(null);
   const docInputRef = useRef<HTMLInputElement>(null);
 
-  const cambiarModo = (m: 'tarjetas' | 'lista') => {
-    setModo(m);
-    localStorage.setItem('obracontrol-clientes-modo', m);
-  };
+  const cambiarModo = (m: 'tarjetas' | 'lista') => onCambiarVista?.(m);
 
   const cliente = seleccionado ? clients.find((c) => c.id === seleccionado.id) || seleccionado : null;
 

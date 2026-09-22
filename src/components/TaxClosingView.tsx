@@ -16,22 +16,18 @@ interface Props {
   bankTransactions: BankTransaction[];
   onNavigate?: (tab: string) => void;
   onUpdateInvoice?: (id: string, campos: Partial<Invoice>) => void;
+  onAjustarSettings?: (cambios: Partial<CompanySettings>) => void;
   onAviso?: (texto: string, tipo?: 'ok' | 'error' | 'info') => void;
 }
 
 type Q = 1 | 2 | 3 | 4 | 'ANUAL';
 
-export const TaxClosingView: React.FC<Props> = ({ invoices, expenses, companySettings, bankTransactions, onNavigate, onUpdateInvoice, onAviso }) => {
+export const TaxClosingView: React.FC<Props> = ({ invoices, expenses, companySettings, bankTransactions, onNavigate, onUpdateInvoice, onAviso, onAjustarSettings }) => {
   const anios = aniosDisponibles([...invoices.map((i) => i.fecha), ...expenses.map((e) => e.fecha)]);
   const [anio, setAnio] = useState<string>(String(anioActual()));
   const [q, setQ] = useState<Q>(trimestreDe(new Date().toISOString().split('T')[0]));
-  const [entregados, setEntregados] = useState<Record<string, string>>(() => {
-    try {
-      return JSON.parse(localStorage.getItem('obracontrol-trimestres-entregados') || '{}');
-    } catch {
-      return {};
-    }
-  });
+  // Va en la configuración, que se sincroniza: lo entregado se ve igual desde cualquier equipo
+  const entregados = companySettings.trimestresEntregados || {};
   const isAutonomo = companySettings.tipoEntidad === 'autonomo';
   const modelos = modelosAplicables(companySettings);
 
@@ -67,9 +63,7 @@ export const TaxClosingView: React.FC<Props> = ({ invoices, expenses, companySet
   const apartar = (q === 'ANUAL' ? anual.iva303 : s.iva303) + (isAutonomo ? (q === 'ANUAL' ? [1, 2, 3, 4].reduce((a, x) => a + mod130(x), 0) : mod130(q as number)) : cuotaIS / 4) + s.retencionesSoportadasAGastos;
   const claveEntrega = `${anio}-${q}`;
   const marcarEntregado = () => {
-    const nuevo = { ...entregados, [claveEntrega]: new Date().toISOString() };
-    setEntregados(nuevo);
-    localStorage.setItem('obracontrol-trimestres-entregados', JSON.stringify(nuevo));
+    onAjustarSettings?.({ trimestresEntregados: { ...entregados, [claveEntrega]: new Date().toISOString() } });
   };
 
   const descargarLibroEmitidas = () => descargarArchivo(`Libro_facturas_emitidas_${q}_${anio}.csv`, csvLibroEmitidas(s.inv), 'text/csv;charset=utf-8');

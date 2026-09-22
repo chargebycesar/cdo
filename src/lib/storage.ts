@@ -118,6 +118,7 @@ export function migrarSettings(raw: Partial<CompanySettings> | undefined): Compa
   if (!s.diasValidezPresupuesto) s.diasValidezPresupuesto = 30;
   if (!s.diasVencimientoFactura) s.diasVencimientoFactura = 30;
   if (!s.ivaPorDefecto) s.ivaPorDefecto = 21;
+  recuperarDelNavegador(s);
   if (!s.metodoPagoPorDefecto) s.metodoPagoPorDefecto = 'Transferencia Bancaria';
   // Los textos antiguos llevaban "30 días" escrito; pasan al comodín para obedecer al ajuste
   s.notaFinalPresupuestoDefecto = normalizarValidez(s.notaFinalPresupuestoDefecto);
@@ -125,6 +126,39 @@ export function migrarSettings(raw: Partial<CompanySettings> | undefined): Compa
   if (!s.plantillasPersonalizadas || s.plantillasPersonalizadas.length === 0) s.plantillasPersonalizadas = DEFAULT_TEMPLATES;
   s.plantillasPersonalizadas = s.plantillasPersonalizadas.map((t: DocumentTemplate) => ({ ...t, notaFinal: t.notaFinal ? normalizarValidez(t.notaFinal) : t.notaFinal, condicionesPago: t.condicionesPago ? normalizarValidez(t.condicionesPago) : t.condicionesPago, base: t.base || (['moderna', 'tecnica', 'compacta', 'clasica'].includes(t.id) ? (t.id as any) : 'moderna') }));
   return s;
+}
+
+/* Rescata a la configuración (que sí va a la nube) lo que las versiones anteriores guardaban
+   suelto en este navegador. Los trimestres entregados son datos, no una preferencia, así que se
+   JUNTAN los dos lados en vez de sustituir: si un equipo marcó el 2T y otro el 3T, quedan ambos.
+   Las preferencias solo se rescatan la primera vez, cuando todavía no hay nada en la nube. */
+function recuperarDelNavegador(s: any) {
+  const leer = (clave: string) => {
+    try {
+      const raw = localStorage.getItem(clave);
+      return raw ? JSON.parse(raw) : null;
+    } catch {
+      return null;
+    }
+  };
+  const entregados = leer('obracontrol-trimestres-entregados');
+  if (entregados && typeof entregados === 'object') {
+    s.trimestresEntregados = { ...entregados, ...(s.trimestresEntregados || {}) };
+  } else if (!s.trimestresEntregados) {
+    s.trimestresEntregados = {};
+  }
+  if (!s.widgetsResumen) {
+    const w = leer('obracontrol_dashboard_widgets');
+    if (w && typeof w === 'object') s.widgetsResumen = w;
+  }
+  if (!s.vistaClientes) {
+    try {
+      const v = localStorage.getItem('obracontrol-clientes-modo');
+      if (v === 'tarjetas' || v === 'lista') s.vistaClientes = v;
+    } catch {
+      // sin storage
+    }
+  }
 }
 
 // Aplica migraciones idempotentes a un estado cargado (local o nube)

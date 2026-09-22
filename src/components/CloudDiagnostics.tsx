@@ -85,6 +85,7 @@ export const CloudDiagnostics: React.FC<Props> = ({ firebaseUser, estadoCompleto
         <div>
           <p className="font-black text-slate-900 flex items-center gap-1.5"><Search size={14} className="text-indigo-600" /> ¿Qué hay en la nube y qué hay aquí?</p>
           <p className="text-[11px] text-slate-500">Cuenta: <b>{firebaseUser.email}</b>. Se lee directamente del servidor, sin caché. No cambia nada hasta que pulses uno de los dos botones de abajo.</p>
+          <p className="text-[11px] text-slate-500 mt-1">Sube <b>todo</b>: clientes, presupuestos, obras, facturas, gastos, banco, agenda, materiales y kits, y la configuración entera (datos de empresa, logotipo, plantillas, numeración, técnicos y horarios, clave de Gemini, dirección del script de avisos, validez y vencimiento, márgenes, trimestres entregados y los bloques del Resumen). Solo se queda en este equipo el permiso de Google de la sesión, que por seguridad no se comparte.</p>
         </div>
         <button type="button" onClick={mirar} disabled={ocupado !== null} className="px-3.5 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-bold flex items-center gap-1.5 cursor-pointer disabled:opacity-50">{ocupado === 'mirar' ? <RefreshCw size={13} className="animate-spin" /> : <Search size={13} />} Mirar la nube</button>
       </div>

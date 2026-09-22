@@ -535,6 +535,11 @@ export interface CompanySettings {
   condicionesPagoDefecto: string;
   diasValidezPresupuesto: number;
   diasVencimientoFactura: number;
+  // Lo que se elige en cada pantalla y tiene que seguirte de un dispositivo a otro.
+  // Vivían en el navegador y no llegaban a la nube: al entrar en otro equipo se perdían.
+  trimestresEntregados?: Record<string, string>; // "2026-3" -> fecha en que se entregó a la gestoría
+  widgetsResumen?: Record<string, boolean>; // qué apartados se ven en el Resumen
+  vistaClientes?: 'tarjetas' | 'lista';
   // Ajustes propios de cada tipo de documento (se editan desde su pestaña, no en Configuración)
   plantillaFacturaPorDefecto?: string; // si falta, se usa plantillaPorDefecto
   metodoPagoPorDefecto?: Invoice['metodoPago'];

@@ -19,30 +19,18 @@ interface Props {
   onSelectProject: (projectId: string) => void;
   onOpenNewInvoice: () => void;
   onOpenNewExpense: () => void;
+  onAjustarSettings?: (cambios: Partial<CompanySettings>) => void;
 }
 
 interface WidgetsConfig { kpis: boolean; alertas: boolean; agenda: boolean; rentabilidad: boolean; hacienda: boolean; pendientes: boolean }
 const DEFAULT_WIDGETS: WidgetsConfig = { kpis: true, alertas: true, agenda: true, rentabilidad: true, hacienda: true, pendientes: true };
 
-export const DashboardView: React.FC<Props> = ({ projects, invoices, expenses, bankTransactions, calendarEvents, clients, companySettings, onNavigate, onSelectProject, onOpenNewInvoice, onOpenNewExpense }) => {
+export const DashboardView: React.FC<Props> = ({ projects, invoices, expenses, bankTransactions, calendarEvents, clients, companySettings, onNavigate, onSelectProject, onOpenNewInvoice, onOpenNewExpense, onAjustarSettings }) => {
   const [periodo, setPeriodo] = useState<PeriodoFiltro>(periodoActual());
   const [showCustomize, setShowCustomize] = useState(false);
-  const [widgets, setWidgets] = useState<WidgetsConfig>(() => {
-    try {
-      const saved = localStorage.getItem('obracontrol_dashboard_widgets');
-      return saved ? { ...DEFAULT_WIDGETS, ...JSON.parse(saved) } : DEFAULT_WIDGETS;
-    } catch {
-      return DEFAULT_WIDGETS;
-    }
-  });
-  const guardarWidgets = (w: WidgetsConfig) => {
-    setWidgets(w);
-    try {
-      localStorage.setItem('obracontrol_dashboard_widgets', JSON.stringify(w));
-    } catch {
-      // ignorar
-    }
-  };
+  // Va en la configuración, que se sincroniza: el Resumen se ve igual desde cualquier equipo
+  const widgets: WidgetsConfig = { ...DEFAULT_WIDGETS, ...(companySettings.widgetsResumen || {}) };
+  const guardarWidgets = (w: WidgetsConfig) => onAjustarSettings?.({ widgetsResumen: w });
 
   const anios = aniosDisponibles([...invoices.map((i) => i.fecha), ...expenses.map((e) => e.fecha), ...projects.map((p) => p.fechaInicio)]);
 

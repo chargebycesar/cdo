@@ -963,7 +963,7 @@ function AppPrincipal() {
 
         <main className="flex-1 overflow-y-auto bg-slate-50 relative">
           {activeTab === 'dashboard' && (
-            <DashboardView projects={projects} invoices={invoices} expenses={expenses} bankTransactions={bankTransactions} calendarEvents={calendarEvents} clients={clients} companySettings={companySettings}
+            <DashboardView onAjustarSettings={ajustarSettings} projects={projects} invoices={invoices} expenses={expenses} bankTransactions={bankTransactions} calendarEvents={calendarEvents} clients={clients} companySettings={companySettings}
               onNavigate={irA} onSelectProject={handleSelectProject}
               onOpenNewInvoice={() => { setPreselectedProjectForInvoice(null); setShowNewInvoiceModal(true); setActiveTab('ventas'); }}
               onOpenNewExpense={() => { setPreselectedProjectForInvoice(null); setShowNewExpenseModal(true); setActiveTab('gastos'); }} />
@@ -1001,10 +1001,10 @@ function AppPrincipal() {
               onReconcileTransaction={handleReconcileTransaction} onUnreconcileTransaction={handleUnreconcileTransaction} onImportTransactions={handleImportTransactions} onDeleteTransaction={handleDeleteTransaction} />
           )}
           {activeTab === 'contactos' && (
-            <ClientsView clients={clients} projects={projects} invoices={invoices} hayDrive={!!firebaseUser} onAviso={(x, tipo) => setAviso({ texto: x, tipo: tipo || 'info' })} onCreateClient={handleCreateClient} onUpdateClient={handleUpdateClient} onDeleteClient={handleDeleteClient} onSelectProject={handleSelectProject} />
+            <ClientsView vista={companySettings.vistaClientes} onCambiarVista={(v) => ajustarSettings({ vistaClientes: v })} clients={clients} projects={projects} invoices={invoices} hayDrive={!!firebaseUser} onAviso={(x, tipo) => setAviso({ texto: x, tipo: tipo || 'info' })} onCreateClient={handleCreateClient} onUpdateClient={handleUpdateClient} onDeleteClient={handleDeleteClient} onSelectProject={handleSelectProject} />
           )}
           {activeTab === 'rentabilidad' && <RentabilityView projects={projects} expenses={expenses} invoices={invoices} onSelectProject={handleSelectProject} />}
-          {activeTab === 'gestoria' && <TaxClosingView invoices={invoices} expenses={expenses} companySettings={companySettings} bankTransactions={bankTransactions} onNavigate={irA} onUpdateInvoice={handleUpdateInvoice} onAviso={(t, tipo) => setAviso({ texto: t, tipo: tipo || 'info' })} />}
+          {activeTab === 'gestoria' && <TaxClosingView onAjustarSettings={ajustarSettings} invoices={invoices} expenses={expenses} companySettings={companySettings} bankTransactions={bankTransactions} onNavigate={irA} onUpdateInvoice={handleUpdateInvoice} onAviso={(t, tipo) => setAviso({ texto: t, tipo: tipo || 'info' })} />}
           {activeTab === 'ajustes' && (
             <SettingsView companySettings={companySettings} onSaveSettings={setCompanySettings} onDeleteExamples={() => setShowDeleteDemoModal(true)} onCargarEjemplos={handleCargarEjemplos} hayDemo={hayDemo}
               estadoCompleto={estadoCompleto} onRestaurarEstado={handleRestaurarEstado} firebaseUser={firebaseUser} estadoNube={estadoNube} errorNube={errorNube} onAviso={(t, tipo) => setAviso({ texto: t, tipo: tipo || 'info' })}

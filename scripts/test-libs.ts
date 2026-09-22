@@ -9,6 +9,8 @@ import { consumoDesdePresupuesto, consumoActualizado, costeRealMateriales, coste
 import { xmlDeFactura, xmlLote, desgloseDe, pendientesDeEnvio, avisosPrevios } from '../src/lib/verifactuXml';
 import { rellenarTexto, normalizarValidez } from '../src/lib/textos';
 import { decidirOrigen } from '../src/lib/sync';
+import { readFileSync, readdirSync, statSync } from 'node:fs';
+import { join } from 'node:path';
 import type { AppState, Invoice, CompanySettings } from '../src/types';
 
 const pad = (s: string, n: number) => s.padEnd(n, ' ').substring(0, n);
